@@ -1,0 +1,57 @@
+name: my-choice-api
+
+networks:
+  my_choice_api:
+  traefik:
+    name: traefik
+    external: true
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        USER_UID: ${UID:-1000}
+        USER_GID: ${GID:-1000}
+        ENVIRONMENT: dev
+    image: my-choice-api:local
+    env_file:
+      - .env
+    expose:
+      - 8000
+    depends_on:
+      db_pg:
+        condition: service_healthy
+    restart: on-failure
+    volumes:
+      - .:/app
+    networks:
+      - traefik
+      - my_choice_api
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-proxy.rule=Host(`my_choice.localhost`)"
+      - "traefik.http.routers.auth-proxy.entrypoints=web"
+
+  db_pg:
+    image: postgres:18-alpine
+    shm_size: 128mb
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES__DB?POSTGRES__DB is required}
+      POSTGRES_USER: ${POSTGRES__USER?POSTGRES__USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES__PASSWORD?POSTGRES__PASSWORD is required}
+    expose:
+      - ${POSTGRES__PORT?POSTGRES__PORT is required}
+    networks:
+      - my_choice_api
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
