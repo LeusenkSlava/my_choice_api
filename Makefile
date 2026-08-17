@@ -32,6 +32,15 @@ upd: docker-env
 up: docker-env
 	$(DOCKER_COMPOSE) up --build --force-recreate
 
+just_up: docker-env
+	$(DOCKER_COMPOSE) up -d
+
+start: docker-env
+	$(DOCKER_COMPOSE) start
+
+restart: docker-env
+	$(DOCKER_COMPOSE) restart
+
 down:
 	$(DOCKER_COMPOSE) down
 

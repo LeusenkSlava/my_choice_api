@@ -1,20 +1,20 @@
-from enum import StrEnum
-from typing import Final
+import logging
+import sys
 
-# fmt: off
-FMT: Final[str] = (
-    "[%(asctime)s.%(msecs)03d] [%(threadName)s] "
-    "%(funcName)20s "
-    "%(module)s:%(lineno)d "
-    "%(levelname)-8s - %(message)s"
-)
-# fmt: on
-DATEFMT: Final[str] = "%Y-%m-%d %H:%M:%S"
+from src.main.config.settings import settings
 
 
-class LoggingLevel(StrEnum):
-    DEBUG = "DEBUG"
-    INFO = "INFO"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    CRITICAL = "CRITICAL"
+def setup_logging() -> None:
+    log_level = settings.app.LOGGING_LEVEL
+
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter(
+        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+    root_logger.handlers.clear()
+    root_logger.addHandler(handler)

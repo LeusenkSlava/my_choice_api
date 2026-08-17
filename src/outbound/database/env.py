@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 
 from src.main.config.settings import settings
-from src.outbound.database.models import BaseModel
+from src.outbound.database.models.base_model import BaseModel
 from src.outbound.database.session import engine
 
 # this is the Alembic Config object, which provides

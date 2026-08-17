@@ -1,14 +1,12 @@
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from src.main.config.logging import LoggingLevel
-
 
 class AppSettings(BaseModel):
     SERVICE_NAME: str = "my_choice_api"
     ROOT_PATH: str = "/"
     DEBUG_MODE: bool = False
-    LOGGING_LEVEL: LoggingLevel = LoggingLevel.INFO
+    LOGGING_LEVEL: str = "INFO"
 
 
 class PostgresSettings(BaseModel):

@@ -5,9 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from openai import AsyncOpenAI
 
 from src.inbound.http.root_router import make_fastapi_root_router
+from src.main.config.logging import setup_logging
 from src.main.config.settings import settings
 from src.outbound.database.session import engine
 
+setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

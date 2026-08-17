@@ -12,4 +12,5 @@ class NovelResponse(BaseModel):
     updated_at: datetime
 
     title: str
-    description: str
+    public_description: str
+    tone: str
