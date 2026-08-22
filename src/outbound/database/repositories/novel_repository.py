@@ -1,9 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.outbound.database.models.novels import NovelModel, CharacterModel, RoadmapModel, DialogueLineModel, \
+from src.outbound.database.models.novels import NovelModel, CharacterModel, RoadmapModel, SceneModel, DialogueLineModel, \
     DialogueActionModel
-from src.core.novels.models import Novel, Character, Roadmap, DialogueLine, DialogueAction
+from src.core.novels.models import Novel, Character, Roadmap, Scene, DialogueLine, DialogueAction
 
 
 class CharacterRepository:
@@ -106,6 +106,54 @@ class RoadmapRepository:
         )
 
 
+class SceneRepository:
+    def __init__(self, session: AsyncSession):
+        self._session = session
+
+    async def add(self, scene: Scene) -> Scene:
+        db_scene = SceneModel(
+            roadmap_id=scene.roadmap_id,
+            title=scene.title,
+            description=scene.description,
+            order=scene.order,
+        )
+        self._session.add(db_scene)
+        await self._session.flush()
+        return self._to_domain(db_scene)
+
+    async def get_by_id(self, scene_id: int) -> Scene | None:
+        result = await self._session.execute(
+            select(SceneModel).where(SceneModel.id == scene_id)
+        )
+        db_scene = result.scalar_one_or_none()
+        return self._to_domain(db_scene) if db_scene else None
+
+    async def list_by_roadmap_id(self, roadmap_id: int) -> list[Scene]:
+        result = await self._session.execute(
+            select(SceneModel)
+            .where(SceneModel.roadmap_id == roadmap_id)
+            .order_by(SceneModel.order)
+        )
+        return [self._to_domain(s) for s in result.scalars().all()]
+
+    async def delete(self, scene_id: int) -> None:
+        db_scene = await self._session.get(SceneModel, scene_id)
+        if db_scene:
+            await self._session.delete(db_scene)
+
+    @staticmethod
+    def _to_domain(db_scene: SceneModel) -> Scene:
+        return Scene(
+            id=db_scene.id,
+            created_at=db_scene.created_at,
+            updated_at=db_scene.updated_at,
+            roadmap_id=db_scene.roadmap_id,
+            title=db_scene.title,
+            description=db_scene.description,
+            order=db_scene.order,
+        )
+
+
 class NovelRepository:
     def __init__(self, session: AsyncSession):
         self._session = session
@@ -155,7 +203,7 @@ class DialogueLineRepository:
     async def add(self, dialog_line: DialogueLine) -> DialogueLine:
         db_dialog_line = DialogueLineModel(
             novel_id = dialog_line.novel_id,
-            roadmap_id = dialog_line.roadmap_id,
+            scene_id = dialog_line.scene_id,
             character_id = dialog_line.character_id,
             order = dialog_line.order,
             text = dialog_line.text,
@@ -167,7 +215,7 @@ class DialogueLineRepository:
 
     async def get_by_id(self, dialog_line_id: int) -> DialogueLine | None:
         result = await self._session.execute(
-            select(DialogueLineModel).where(DialogueLine.id == dialog_line_id)
+            select(DialogueLineModel).where(DialogueLineModel.id == dialog_line_id)
         )
         db_dialog_line = result.scalar_one_or_none()
         return self._to_domain(db_dialog_line) if db_dialog_line else None
@@ -176,6 +224,14 @@ class DialogueLineRepository:
         result = await self._session.execute(
             select(DialogueLineModel)
             .where(DialogueLineModel.novel_id == novel_id)
+            .order_by(DialogueLineModel.order)
+        )
+        return [self._to_domain(r) for r in result.scalars().all()]
+
+    async def list_by_scene_id(self, scene_id: int) -> list[DialogueLine]:
+        result = await self._session.execute(
+            select(DialogueLineModel)
+            .where(DialogueLineModel.scene_id == scene_id)
             .order_by(DialogueLineModel.order)
         )
         return [self._to_domain(r) for r in result.scalars().all()]
@@ -192,7 +248,7 @@ class DialogueLineRepository:
             created_at=db_dialog_line.created_at,
             updated_at=db_dialog_line.updated_at,
             novel_id=db_dialog_line.novel_id,
-            roadmap_id=db_dialog_line.roadmap_id,
+            scene_id=db_dialog_line.scene_id,
             character_id=db_dialog_line.character_id,
             order=db_dialog_line.order,
             text=db_dialog_line.text,

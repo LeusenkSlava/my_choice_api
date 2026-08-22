@@ -26,6 +26,17 @@ class Roadmap:
     choice_stakes: str | None
 
 @dataclass
+class Scene:
+    id: int | None
+    created_at: datetime | None
+    updated_at: datetime | None
+
+    roadmap_id: int
+    title: str
+    description: str
+    order: int
+
+@dataclass
 class Novel:
     id: int | None
     created_at: datetime | None
@@ -42,7 +53,7 @@ class DialogueLine:
     updated_at: datetime | None
 
     novel_id: int
-    roadmap_id: int
+    scene_id: int
     character_id: int
 
     order: int
