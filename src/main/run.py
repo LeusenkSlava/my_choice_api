@@ -1,13 +1,14 @@
-import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.inbound.http.root_router import make_fastapi_root_router
-from src.inbound.kafka.consumer import consume_loop, consumer
+from src.inbound.kafka.consumer import consumer
 from src.main.config.logging import setup_logging
 from src.main.config.settings import settings
+from src.main.setup.background_tasks import BackgroundTaskRunner
+from src.main.workers import BACKGROUND_WORKERS
 from src.outbound.database.session import engine
 from src.outbound.kafka.client import producer
 
@@ -18,15 +19,13 @@ setup_logging()
 async def lifespan(app: FastAPI):
     await producer.start()
     await consumer.start()
-    consumer_task = asyncio.create_task(consume_loop())
+
+    background_tasks = BackgroundTaskRunner()
+    background_tasks.start_all(BACKGROUND_WORKERS)
 
     yield
 
-    consumer_task.cancel()
-    try:
-        await consumer_task
-    except asyncio.CancelledError:
-        pass
+    await background_tasks.shutdown()
     await consumer.stop()
     await producer.stop()
     await engine.dispose()

@@ -6,3 +6,7 @@ class NovelNotFoundError(Exception):
 
 class NovelGenerationError(Exception):
     """AI не смог сгенерировать описание."""
+
+
+class ActiveJobAlreadyExistsError(Exception):
+    """Активная задача с таким dedup_key уже существует."""
