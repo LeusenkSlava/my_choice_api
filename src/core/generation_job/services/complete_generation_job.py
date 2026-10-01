@@ -15,9 +15,9 @@ class CompleteGenerationJobService:
 
     async def handle_result(self, result: GenerationResult) -> None:
         if result.status == "done":
-            updated = await self.repository.mark_done(result.job_id, result.result_id)
+            updated = await self._repository.mark_done(result.job_id, result.result_id)
         else:
-            updated = await self.repository.mark_failed(result.job_id, result.error)
+            updated = await self._repository.mark_failed(result.job_id, result.error)
 
         if not updated:
             logger.info(

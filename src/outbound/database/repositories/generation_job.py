@@ -1,5 +1,3 @@
-from unittest import result
-
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession

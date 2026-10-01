@@ -30,5 +30,6 @@ class PublishGenerationJobsService:
             except Exception as e:
                 logger.error(f"Failed to publish job {job.id}: {e}")
                 await self._repository.release(job_id=job.id)
+                continue
 
             await self._repository.mark_sent(job.id)

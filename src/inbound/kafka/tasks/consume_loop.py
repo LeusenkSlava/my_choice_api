@@ -11,8 +11,8 @@ async def consume_loop():
     async for msg in consumer:
         topic = msg.topic
         handler = TOPIC_HANDLERS.get(topic)
-        if handler:
-            await handler(msg.value)
+        if handler is None:
+            logger.warning("Нет обработчика для топика %s, пропускаем", topic)
         else:
             await _handle_with_retry(handler, msg)
         await consumer.commit()
