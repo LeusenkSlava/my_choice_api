@@ -80,5 +80,6 @@ fabric.properties
 .env
 .secrets
 
+__pycache__/
 .codewhale
 .venv

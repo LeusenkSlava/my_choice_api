@@ -5,9 +5,7 @@ BOOTSTRAP="kafka:9092"
 
 # формат: topic:partitions:replication:retention_ms
 TOPICS=(
-  "tickets.created:3:1:604800000"
-  "tickets.paid:3:1:604800000"
-  "notifications.email:3:1:259200000"
+  "ai_plot.novel.generate:3:1:604800000"
 )
 
 for entry in "${TOPICS[@]}"; do

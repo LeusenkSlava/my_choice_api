@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 class NovelCreateRequest(BaseModel):
     prompt: str
+    universe_id: int
+
 
 class NovelResponse(BaseModel):
     id: int

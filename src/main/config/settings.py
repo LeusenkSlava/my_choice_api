@@ -6,7 +6,7 @@ class AppSettings(BaseModel):
     SERVICE_NAME: str = "my_choice_api"
     ROOT_PATH: str = "/"
     DEBUG_MODE: bool = False
-    LOGGING_LEVEL: str = "INFO"
+    LOGGING_LEVEL: str = "DEBUG"
 
 
 class PostgresSettings(BaseModel):
@@ -28,8 +28,9 @@ class PostgresSettings(BaseModel):
         ).unicode_string()
 
 
-class DeepSeekSettings(BaseSettings):
-    API_KEY: str
+class KafkaSettings(BaseSettings):
+    BOOTSTRAP_SERVERS: str = "kafka:9092"
+    CLIENT_ID: str = "my-choice-api"
 
 
 class Settings(BaseSettings):
@@ -40,7 +41,7 @@ class Settings(BaseSettings):
 
     app: AppSettings = AppSettings()
     postgres: PostgresSettings
-    deepseek: DeepSeekSettings
+    kafka: KafkaSettings
 
 
 settings = Settings()
