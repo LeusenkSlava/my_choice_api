@@ -1,27 +1,42 @@
 from contextlib import asynccontextmanager
+from functools import partial
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.inbound.http.root_router import make_fastapi_root_router
-from src.inbound.kafka.consumer import consumer
+from src.inbound.kafka.consumer import build_consumer
+from src.inbound.kafka.tasks.consume_loop import consume_loop
 from src.main.config.logging import setup_logging
 from src.main.config.settings import settings
 from src.main.setup.background_tasks import BackgroundTaskRunner
-from src.main.workers import BACKGROUND_WORKERS
+from src.outbound.ai_plot.tasks.generation_job_relay_worker import (
+    run_generation_job_relay_worker,
+)
 from src.outbound.database.session import engine
-from src.outbound.kafka.client import producer
+from src.outbound.kafka.client import build_producer
+from src.outbound.kafka.publishers.generation_job import KafkaGenerationJobPublisher
 
 setup_logging()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    producer = build_producer()
     await producer.start()
+    consumer = build_consumer()
     await consumer.start()
 
     background_tasks = BackgroundTaskRunner()
-    background_tasks.start_all(BACKGROUND_WORKERS)
+    background_tasks.start_all(
+        {
+            "generation_job_relay": partial(
+                run_generation_job_relay_worker,
+                KafkaGenerationJobPublisher(producer),
+            ),
+            "consume_loop": partial(consume_loop, consumer),
+        }
+    )
 
     yield
 

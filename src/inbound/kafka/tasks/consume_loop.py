@@ -1,13 +1,14 @@
 import asyncio
 import logging
 
-from src.inbound.kafka.consumer import consumer
+from aiokafka import AIOKafkaConsumer
+
 from src.inbound.kafka.handlers import TOPIC_HANDLERS, MessageHandler
 
 logger = logging.getLogger(__name__)
 
 
-async def consume_loop():
+async def consume_loop(consumer: AIOKafkaConsumer) -> None:
     async for msg in consumer:
         topic = msg.topic
         handler = TOPIC_HANDLERS.get(topic)

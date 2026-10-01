@@ -2,10 +2,14 @@ import json
 
 from src.core.generation_job.interfaces import GenerationJobPublisherProtocol
 from src.outbound.ai_plot.topic import Topics
-from src.outbound.kafka.client import producer
+from aiokafka import AIOKafkaProducer
+
 
 
 class KafkaGenerationJobPublisher(GenerationJobPublisherProtocol):
+    def __init__(self, producer: AIOKafkaProducer) -> None:
+        self._producer = producer
+
     async def publish(
         self,
         id: int,
@@ -19,4 +23,4 @@ class KafkaGenerationJobPublisher(GenerationJobPublisherProtocol):
                 "universe_id": universe_id,
             }
         ).encode()
-        await producer.send_and_wait(Topics.NOVEL_EVENTS_CREATE, payload)
+        await self._producer.send_and_wait(Topics.NOVEL_EVENTS_CREATE, payload)
