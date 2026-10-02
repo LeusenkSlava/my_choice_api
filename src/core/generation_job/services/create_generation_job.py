@@ -12,23 +12,26 @@ class CreateGenerationJobService:
     ):
         self._generation_job_repo = generation_job_repo
 
-    async def execute(self, data) -> GenerationJob:
+    async def execute(
+        self, kind: JobKind, payload: dict, dedup_key: str
+    ) -> GenerationJob:
+        """Создать задачу или вернуть уже активную с тем же dedup_key."""
         existing = await self._generation_job_repo.get_active_by_dedup_key(
-            kind=JobKind.NOVEL, dedup_key=data.dedup_key
+            kind=kind, dedup_key=dedup_key
         )
         if existing is not None:
             return existing
 
         generation_job = GenerationJob(
-            payload=data.model_dump(mode="json"),
-            dedup_key=data.dedup_key,
-            kind=JobKind.NOVEL,
+            payload=payload,
+            dedup_key=dedup_key,
+            kind=kind,
         )
         try:
             created = await self._generation_job_repo.create(generation_job)
         except ActiveJobAlreadyExistsError:
             existing = await self._generation_job_repo.get_active_by_dedup_key(
-                kind=JobKind.NOVEL, dedup_key=data.dedup_key
+                kind=kind, dedup_key=dedup_key
             )
             return existing
 

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from starlette.responses import RedirectResponse
 
+from src.inbound.http.generation_jobs.router import router as generation_jobs_router
 from src.inbound.http.health.router import router as health_router
 from src.inbound.http.novels.router import router as novel_router
 
@@ -17,5 +18,6 @@ def make_fastapi_root_router(*, debug_mode: bool) -> APIRouter:
 
     router.include_router(health_router)
     router.include_router(novel_router)
+    router.include_router(generation_jobs_router)
 
     return router

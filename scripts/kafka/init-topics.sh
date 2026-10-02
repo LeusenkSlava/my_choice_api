@@ -6,6 +6,7 @@ BOOTSTRAP="kafka:9092"
 # формат: topic:partitions:replication:retention_ms
 TOPICS=(
   "ai_plot.novel.generate:3:1:604800000"
+  "ai_plot.scene.generate:3:1:604800000"
   "generation.results:3:1:604800000"
 )
 

@@ -34,6 +34,11 @@ class GenerationJobRepository:
             raise
         return self._to_entity(generation_job)
 
+    async def get_by_id(self, job_id: int) -> GenerationJob | None:
+        """Получить задачу по id."""
+        model = await self._session.get(GenerationJobModel, job_id)
+        return self._to_entity(model) if model else None
+
     async def get_active_by_dedup_key(
         self,
         kind: JobKind,

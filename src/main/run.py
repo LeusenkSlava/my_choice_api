@@ -10,6 +10,7 @@ from src.inbound.kafka.tasks.consume_loop import consume_loop
 from src.main.config.logging import setup_logging
 from src.main.config.settings import settings
 from src.main.setup.background_tasks import BackgroundTaskRunner
+from src.outbound.ai_plot.client import build_ai_plot_client
 from src.outbound.ai_plot.tasks.generation_job_relay_worker import (
     run_generation_job_relay_worker,
 )
@@ -26,6 +27,7 @@ async def lifespan(app: FastAPI):
     await producer.start()
     consumer = build_consumer()
     await consumer.start()
+    app.state.ai_plot_client = build_ai_plot_client()
 
     background_tasks = BackgroundTaskRunner()
     background_tasks.start_all(
@@ -41,6 +43,7 @@ async def lifespan(app: FastAPI):
     yield
 
     await background_tasks.shutdown()
+    await app.state.ai_plot_client.aclose()
     await consumer.stop()
     await producer.stop()
     await engine.dispose()

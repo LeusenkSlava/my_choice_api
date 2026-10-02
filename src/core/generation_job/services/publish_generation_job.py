@@ -22,11 +22,7 @@ class PublishGenerationJobsService:
         jobs = await self._repository.claim_created(limit=10)
         for job in jobs:
             try:
-                await self._publisher.publish(
-                    job_id=job.id,
-                    user_prompt=job.payload["prompt"],
-                    universe_id=job.payload["universe_id"],
-                )
+                await self._publisher.publish(job)
             except Exception as e:
                 logger.error(f"Failed to publish job {job.id}: {e}")
                 await self._repository.release(job_id=job.id)

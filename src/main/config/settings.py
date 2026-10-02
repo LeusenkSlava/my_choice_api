@@ -33,6 +33,11 @@ class KafkaSettings(BaseSettings):
     CLIENT_ID: str = "my-choice-api"
 
 
+class AiPlotSettings(BaseSettings):
+    BASE_URL: str = "http://ai_plot:8000"
+    TIMEOUT: float = 10.0
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -42,6 +47,7 @@ class Settings(BaseSettings):
     app: AppSettings = AppSettings()
     postgres: PostgresSettings
     kafka: KafkaSettings
+    ai_plot: AiPlotSettings
 
 
 settings = Settings()
