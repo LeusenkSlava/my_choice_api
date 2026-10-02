@@ -23,7 +23,7 @@ class PublishGenerationJobsService:
         for job in jobs:
             try:
                 await self._publisher.publish(
-                    id=job.id,
+                    job_id=job.id,
                     user_prompt=job.payload["prompt"],
                     universe_id=job.payload["universe_id"],
                 )

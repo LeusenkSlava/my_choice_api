@@ -6,7 +6,7 @@ from src.core.generation_job.models.generation_job import GenerationJob
 class GenerationJobPublisherProtocol(Protocol):
     async def publish(
         self,
-        id: int,
+        job_id: int,
         user_prompt: str,
         universe_id: int,
     ) -> None: ...

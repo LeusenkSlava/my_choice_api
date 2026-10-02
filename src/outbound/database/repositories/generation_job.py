@@ -89,7 +89,7 @@ class GenerationJobRepository:
         )
 
     async def mark_done(self, job_id: int, result_id: int) -> bool:
-        result = await self.session.execute(
+        result = await self._session.execute(
             update(GenerationJobModel)
             .where(
                 GenerationJobModel.id == job_id,

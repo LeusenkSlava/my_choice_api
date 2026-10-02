@@ -1,5 +1,3 @@
-import uuid
-
 from sqlalchemy import Index, String, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
@@ -38,5 +36,5 @@ class GenerationJobModel(BaseModel):
         nullable=False,
         server_default=JobStatus.CREATED.value,
     )
-    result_id: Mapped[uuid.UUID | None]
+    result_id: Mapped[int | None]
     error: Mapped[str | None]

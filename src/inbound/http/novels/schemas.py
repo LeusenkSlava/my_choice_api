@@ -8,7 +8,7 @@ from src.core.generation_job.models.enums import JobStatus
 
 class NovelCreateRequest(BaseModel):
     prompt: str
-    universe_id: int
+    universe_id: int | None = None
 
     @property
     def dedup_key(self) -> str:

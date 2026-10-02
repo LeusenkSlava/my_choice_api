@@ -1,9 +1,9 @@
 import json
 
-from src.core.generation_job.interfaces import GenerationJobPublisherProtocol
-from src.outbound.ai_plot.topic import Topics
 from aiokafka import AIOKafkaProducer
 
+from src.core.generation_job.interfaces import GenerationJobPublisherProtocol
+from src.outbound.ai_plot.topic import Topics
 
 
 class KafkaGenerationJobPublisher(GenerationJobPublisherProtocol):
@@ -12,13 +12,13 @@ class KafkaGenerationJobPublisher(GenerationJobPublisherProtocol):
 
     async def publish(
         self,
-        id: int,
+        job_id: int,
         user_prompt: str,
         universe_id: int,
     ) -> None:
         payload = json.dumps(
             {
-                "request_id": str(id),
+                "job_id": str(job_id),
                 "prompt": user_prompt,
                 "universe_id": universe_id,
             }
