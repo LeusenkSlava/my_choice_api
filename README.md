@@ -57,7 +57,7 @@
 
 ## Стек
 
-- Python 3.13, FastAPI, Uvicorn
+- Python 3.13 (Docker-образ; проект требует `>=3.12`), FastAPI, Uvicorn
 - PostgreSQL 18, SQLAlchemy 2, Alembic
 - Kafka 3.8 (KRaft, без ZooKeeper), aiokafka
 - uv для управления зависимостями
@@ -140,6 +140,8 @@ curl -X POST http://my_choice.localhost/novels/ \
   -d '{"prompt": "Детектив в киберпанк-городе", "universe_id": 1}'
 ```
 
+`universe_id` можно не передавать.
+
 Ответ `202 Accepted` содержит идентификатор и статус задачи:
 
 ```json
@@ -162,7 +164,7 @@ curl http://my_choice.localhost/novels/1/next
 
 | Метод и путь | Назначение |
 |---|---|
-| `POST /novels/` | Запустить генерацию новеллы → `202` + задача |
+| `POST /novels/` | Запустить генерацию новеллы (`prompt`, опционально `universe_id`) → `202` + задача |
 | `GET /novels/?limit=&offset=` | Список новелл |
 | `GET /novels/{id}` | Карточка новеллы |
 | `DELETE /novels/{id}` | Удалить новеллу |
@@ -196,7 +198,7 @@ curl http://my_choice.localhost/novels/1/next
 | `APP__ROOT_PATH` | `/` | Root path для работы за прокси |
 | `KAFKA__BOOTSTRAP_SERVERS` | `kafka:9092` | Адрес брокера Kafka |
 | `KAFKA__CLIENT_ID` | `my-choice-api` | Client ID продюсера |
-| `AI_PLOT__BASE_URL` | `http://ai_plot:8000` | Адрес HTTP API сервиса `ai_plot` |
+| `AI_PLOT__BASE_URL` | `http://ai_plot_generator-app-1:8000` | Адрес HTTP API сервиса `ai_plot` (значение из `env.example`; fallback в коде — `http://ai_plot:8000`) |
 | `AI_PLOT__TIMEOUT` | `10` | Таймаут HTTP-запросов к `ai_plot`, в секундах |
 | `POSTGRES__DB`, `__HOST`, `__PORT`, `__USER`, `__PASSWORD` | — | Подключение к PostgreSQL (обязательные) |
 
