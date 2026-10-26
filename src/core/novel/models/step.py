@@ -19,9 +19,11 @@ class DialogueLine:
     text: str
     is_final_for_scene: bool
     background_asset_key: str | None
+    sound_asset_key: str | None
     sprite_asset_key: str | None
     outfit_asset_key: str | None
     emotion_asset_key: str | None
+    is_thought: bool = False
 
 
 @dataclass(frozen=True, slots=True)

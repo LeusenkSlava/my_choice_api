@@ -94,6 +94,7 @@ src/
 - Docker и Docker Compose
 - make
 - Запущенный сервис `ai_plot`, доступный по `AI_PLOT__BASE_URL`. Без него ручки чтения новелл отвечают `502`
+- Запущенный сервис Kafka (отдельный сервис `kafka`; брокер доступен как `kafka:9092`). Поднимите его **первым** — он создаёт сеть `kafka`, к которой подключается этот сервис.
 - Запущенный [Traefik](https://doc.traefik.io/traefik/) во внешней Docker-сети `traefik`. Через него открываются API и Kafka UI. Если сети ещё нет, создайте её:
 
   ```bash
@@ -121,7 +122,7 @@ POSTGRES__PASSWORD=change_me
 make upd
 ```
 
-Команда соберёт образ и поднимет PostgreSQL, Kafka, Kafka UI и приложение. Перед стартом приложение применяет миграции (`alembic upgrade head`). Одноразовый контейнер `kafka-init` создаёт топики из [scripts/kafka/init-topics.sh](scripts/kafka/init-topics.sh).
+Команда соберёт образ и поднимет PostgreSQL и приложение. Перед стартом приложение применяет миграции (`alembic upgrade head`). Kafka (брокер, `kafka-init`, Kafka UI) запускается отдельным сервисом `kafka` — сначала `make upd` в соседнем каталоге `kafka/`.
 
 ### 3. Проверка
 
@@ -210,6 +211,6 @@ curl http://my_choice.localhost/novels/1/next
 | `ai_plot.scene.generate` | публикуем | Запрос на генерацию следующей сцены: `job_id`, `novel_id`, `scene_order`. Ключ сообщения — `novel_id`, чтобы сцены одной новеллы шли в одну партицию |
 | `generation.results` | читаем | Результат генерации новеллы или сцены: `job_id`, `status` (`done` или `failed`), `result_id` (обязателен при `done`), `error` |
 
-Для нового входящего топика нужно сделать две вещи: добавить топик в `init-topics.sh` и зарегистрировать обработчик в `TOPIC_HANDLERS` в [src/inbound/kafka/handlers/\_\_init\_\_.py](src/inbound/kafka/handlers/__init__.py).
+Для нового входящего топика нужно сделать две вещи: добавить топик в `init-topics.sh` (сервис `kafka`) и зарегистрировать обработчик в `TOPIC_HANDLERS` в [src/inbound/kafka/handlers/\_\_init\_\_.py](src/inbound/kafka/handlers/__init__.py).
 
-Новые топики добавляются в массив `TOPICS` в [scripts/kafka/init-topics.sh](scripts/kafka/init-topics.sh).
+Новые топики добавляются в массив `TOPICS` в `init-topics.sh` сервиса `kafka` (см. `kafka/scripts/kafka/init-topics.sh`).
